@@ -1,13 +1,13 @@
 library(dplyr)
 
 #Modifies data to use relevant stats
-league_data <- read.csv("data\\mls_season_2026_stats")
+league_data <- read.csv("data/mls_season_2026_stats.csv")
 
 league_data <- league_data %>% filter(Status != "Upcoming")
 
 #These are the stats in the form number (percentage), which we must split
-split_stats <- c("Accurate passes", "Accurate long balls", "Accurate crosses",
-                 "Ground duels won", "Aerial duels won", "Successful dribbles")
+split_stats <- c("Accurate.passes", "Accurate.long.balls", "Accurate.crosses",
+                 "Ground.duels.won", "Aerial.duels.won", "Successful.dribbles")
 split_percentage_columns <- function(df, cols) {
   for (col in cols) {
     if (col %in% names(df)) {
@@ -28,7 +28,7 @@ split_percentage_columns <- function(df, cols) {
   df
 }
 league_data <- split_percentage_columns(league_data, split_stats)
-league_data[["Ball possession percentage"]] <- as.numeric(sub("%", "", league_data[["Ball possession"]])) / 100
+league_data[["Ball.possession"]] <- as.numeric(sub("%", "", league_data[["Ball.possession"]])) / 100
 
 #Also add opponent non-penalty xG
 league_data[["Non-penalty xG against"]] <- NA
@@ -42,10 +42,12 @@ for (i in seq_len(nrow(league_data))) {
   other_rows <- match_rows[league_data[["Team"]][match_rows] != team_val]
 
   if (length(other_rows) > 0) {
-    league_data[["Non-penalty xG against"]][i] <- league_data[["Non-penalty xG"]][other_rows[1]]
+    league_data[["Non-penalty xG against"]][i] <- league_data[["Non.penalty.xG"]][other_rows[1]]
   }
 }
-league_data[["Non-penalty xG difference"]] <- league_data[["Non-penalty xG"]] - league_data[["Non-penalty xG against"]]
+league_data[["Non-penalty xG difference"]] <- league_data[["Non.penalty.xG"]] - league_data[["Non-penalty xG against"]]
+
+#league_data
 
 #remove non-numeric columns from the data frame
 exclude_cols <- c()
@@ -54,34 +56,42 @@ for (col in names(league_data)) {
        exclude_cols <- c(exclude_cols, col)
      }
 }
+exclude_cols <- c(exclude_cols, c("Round", "No","Non-penalty xG difference"))
+exclude_cols
 
 #For each team in the league, compute correlation of points vs another metric for each game
+results_table <- list()
+
 for (team in unique(league_data$Team)) {
+    team_data <- league_data %>% filter(Team == team)
     results <- list()
-    for (col in setdiff(names(league_data), c(exclude_cols, "Non-penalty xG difference"))) {
-        # Pull out the two vectors we're comparing
-        x <- league_data[[col]]                         # the predictor stat
-        y <- league_data$"Non-penalty xG difference"    # our target
-        
-        # Run both correlation tests
-        pearson_test  <- cor.test(x, y, method = "pearson")
+    for (col in setdiff(names(team_data), exclude_cols)) {
+        x <- team_data[[col]]
+        y <- team_data[["Non-penalty xG difference"]]
+
+        pearson_test <- cor.test(x, y, method = "pearson")
         spearman_test <- cor.test(x, y, method = "spearman")
-        
-        # Store everything we care about in one row (as a small data frame)
+
         results[[col]] <- data.frame(
-            stat            = col,
-            pearson_r       = unname(pearson_test$estimate),
-            pearson_r2      = unname(pearson_test$estimate)^2,
-            pearson_p       = pearson_test$p.value,
-            spearman_rho    = unname(spearman_test$estimate),
-            spearman_p      = spearman_test$p.value,
-            league          = league_name    #for when we join/filter with other tables
-            )
+            stat = col,
+            pearson_r = unname(pearson_test$estimate),
+            pearson_r2 = unname(pearson_test$estimate)^2,
+            pearson_p = pearson_test$p.value,
+            spearman_rho = unname(spearman_test$estimate),
+            spearman_p = spearman_test$p.value,
+            team_name = team
+        )
     }
+    results_table[[team]] <- do.call(rbind, results)
+    #Write individual team results as CSV
+    write.csv(results_table[[team]], file = paste0("output/", team, "_correlation_results.csv"), row.names = FALSE)
 }
-results_table <- do.call(rbind, results)
+
+results_table <- do.call(rbind, results_table)
+
 # Reset row names (they'll otherwise be messy from the list names)
 rownames(results_table) <- NULL
+#Write full data as CSV
+write.csv(results_table, file = "output/mls_correlation_results.csv", row.names = FALSE)
 
-return(results_table)
   
