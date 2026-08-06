@@ -30,10 +30,58 @@ split_percentage_columns <- function(df, cols) {
 league_data <- split_percentage_columns(league_data, split_stats)
 league_data[["Ball possession percentage"]] <- as.numeric(sub("%", "", league_data[["Ball possession"]])) / 100
 
+#Also add opponent non-penalty xG
+league_data[["Non-penalty xG against"]] <- NA
+
+#for each row, find the other team in the match and get their non-penalty xG
+for (i in seq_len(nrow(league_data))) {
+  match_val <- league_data[["Match"]][i]
+  team_val <- league_data[["Team"]][i]
+
+  match_rows <- which(league_data[["Match"]] == match_val)
+  other_rows <- match_rows[league_data[["Team"]][match_rows] != team_val]
+
+  if (length(other_rows) > 0) {
+    league_data[["Non-penalty xG against"]][i] <- league_data[["Non-penalty xG"]][other_rows[1]]
+  }
+}
+league_data[["Non-penalty xG difference"]] <- league_data[["Non-penalty xG"]] - league_data[["Non-penalty xG against"]]
+
+#remove non-numeric columns from the data frame
+exclude_cols <- c()
+for (col in names(league_data)) {
+     if (!is.numeric(league_data[[col]])) {
+       exclude_cols <- c(exclude_cols, col)
+     }
+}
 
 #For each team in the league, compute correlation of points vs another metric for each game
 for (team in unique(league_data$Team)) {
-  
-  
+    results <- list()
+    for (col in setdiff(names(league_data), c(exclude_cols, "Non-penalty xG difference"))) {
+        # Pull out the two vectors we're comparing
+        x <- league_data[[col]]                         # the predictor stat
+        y <- league_data$"Non-penalty xG difference"    # our target
+        
+        # Run both correlation tests
+        pearson_test  <- cor.test(x, y, method = "pearson")
+        spearman_test <- cor.test(x, y, method = "spearman")
+        
+        # Store everything we care about in one row (as a small data frame)
+        results[[col]] <- data.frame(
+            stat            = col,
+            pearson_r       = unname(pearson_test$estimate),
+            pearson_r2      = unname(pearson_test$estimate)^2,
+            pearson_p       = pearson_test$p.value,
+            spearman_rho    = unname(spearman_test$estimate),
+            spearman_p      = spearman_test$p.value,
+            league          = league_name    #for when we join/filter with other tables
+            )
+    }
 }
+results_table <- do.call(rbind, results)
+# Reset row names (they'll otherwise be messy from the list names)
+rownames(results_table) <- NULL
+
+return(results_table)
   
