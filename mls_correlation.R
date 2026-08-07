@@ -47,17 +47,28 @@ for (i in seq_len(nrow(league_data))) {
 }
 league_data[["Non-penalty xG difference"]] <- league_data[["Non.penalty.xG"]] - league_data[["Non-penalty xG against"]]
 
+#cleaned league data for reference
+write.csv(league_data, file = "output/cleaned_mls_season_2026_stats.csv", row.names = FALSE)
+
 #league_data
 
 #remove non-numeric columns from the data frame
 exclude_cols <- c()
 for (col in names(league_data)) {
-     if (!is.numeric(league_data[[col]])) {
-       exclude_cols <- c(exclude_cols, col)
-     }
+  if (!is.numeric(league_data[[col]])) {
+    exclude_cols <- c(exclude_cols, col)
+  }
 }
-exclude_cols <- c(exclude_cols, c("Round", "No","Non-penalty xG difference"))
-exclude_cols
+exclude_cols <- c(exclude_cols,
+  "Round",
+  "No",
+  "Non-penalty xG difference",
+  "Red.cards",
+  "Non.penalty.xG",
+  "Non-penalty xG against",
+  "Expected.goals..xG.",
+  "xG.on.target..xGOT."
+)
 
 #For each team in the league, compute correlation of points vs another metric for each game
 results_table <- list()
@@ -91,7 +102,17 @@ results_table <- do.call(rbind, results_table)
 
 # Reset row names (they'll otherwise be messy from the list names)
 rownames(results_table) <- NULL
+
+#Since we are running multiple significance tests simultaneously, we implement FDR adjusted p-values
+#First, adjust across all p-values in the full table
+#Second, adjust within each stat so each stat gets its own FDR correction
+results_table <- results_table %>%
+  mutate(pearson_fdr_p = p.adjust(pearson_p, method = "fdr")) %>%
+  group_by(stat) %>%
+  mutate(pearson_fdr_p_by_stat = p.adjust(pearson_p, method = "fdr")) %>%
+  ungroup()
+
 #Write full data as CSV
 write.csv(results_table, file = "output/mls_correlation_results.csv", row.names = FALSE)
-
-  
+results_table <- results_table %>% arrange(stat, desc(pearson_r2))
+write.csv(results_table, file = "output/mls_correlation_results_sorted_by_stat.csv", row.names = FALSE)
