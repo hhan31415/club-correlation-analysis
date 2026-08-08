@@ -95,7 +95,7 @@ for (team in unique(league_data$Team)) {
     }
     results_table[[team]] <- do.call(rbind, results)
     #Write individual team results as CSV
-    write.csv(results_table[[team]], file = paste0("output/", team, "_correlation_results.csv"), row.names = FALSE)
+    write.csv(results_table[[team]], file = paste0("output/club_results/", team, "_correlation_results.csv"), row.names = FALSE)
 }
 
 results_table <- do.call(rbind, results_table)
@@ -112,7 +112,12 @@ results_table <- results_table %>%
   mutate(pearson_fdr_p_by_stat = p.adjust(pearson_p, method = "fdr")) %>%
   ungroup()
 
+#Filter for significant results (FDR adjusted p < 0.05)
+significant_results <- results_table %>%
+  filter(pearson_fdr_p < 0.05) %>% arrange(stat, desc(pearson_r2))
+
 #Write full data as CSV
 write.csv(results_table, file = "output/mls_correlation_results.csv", row.names = FALSE)
 results_table <- results_table %>% arrange(stat, desc(pearson_r2))
 write.csv(results_table, file = "output/mls_correlation_results_sorted_by_stat.csv", row.names = FALSE)
+write.csv(significant_results, file = "output/mls_correlation_significant_results.csv", row.names = FALSE)
