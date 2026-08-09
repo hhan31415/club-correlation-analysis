@@ -1,9 +1,14 @@
 library(dplyr)
 
 #Modifies data to use relevant stats
-league_data <- read.csv("data/mls_season_2026_stats.csv")
+league <- "premier_league"
+#league <- "mls"
 
-league_data <- league_data %>% filter(Status != "Upcoming")
+league_data <- read.csv(paste0("data/", league, "_season_2025-2026_stats.csv"))
+#league_data <- read.csv(paste0("data/", league, "_season_2026_stats.csv"))
+
+
+league_data <- league_data %>% filter(Status != "Upcoming") # nolint: pipe_consistency_linter.
 
 #These are the stats in the form number (percentage), which we must split
 split_stats <- c("Accurate.passes", "Accurate.long.balls", "Accurate.crosses",
@@ -14,7 +19,7 @@ split_percentage_columns <- function(df, cols) {
       raw_vals <- as.character(df[[col]])
 
       count_vals <- suppressWarnings(
-        as.numeric(sub("^\\s*(\\d+(?:\\.\\d+)?)\\s*\\((\\d+(?:\\.\\d+)?)%\\)\\s*$", "\\1", raw_vals, perl = TRUE))
+        as.numeric(sub("^\\s*(\\d+(?:\\.\\d+)?)\\s*\\((\\d+(?:\\.\\d+)?)%\\)\\s*$", "\\1", raw_vals, perl = TRUE)) # nolint
       )
       pct_vals <- suppressWarnings(
         as.numeric(sub("^\\s*(\\d+(?:\\.\\d+)?)\\s*\\((\\d+(?:\\.\\d+)?)%\\)\\s*$", "\\2", raw_vals, perl = TRUE)) / 100
@@ -45,10 +50,12 @@ for (i in seq_len(nrow(league_data))) {
     league_data[["Non-penalty xG against"]][i] <- league_data[["Non.penalty.xG"]][other_rows[1]]
   }
 }
-league_data[["Non-penalty xG difference"]] <- league_data[["Non.penalty.xG"]] - league_data[["Non-penalty xG against"]]
+league_data[["Non-penalty xG difference"]] <- league_data[["Non.penalty.xG"]] - league_data[["Non-penalty xG against"]] # nolint
+league_data <- league_data %>% mutate(npxG_per_shot = Non.penalty.xG / Total.shots)
+league_data <- league_data %>% select(-"Distance.covered", -"Sprinting", -"Number.of.sprints")
 
 #cleaned league data for reference
-write.csv(league_data, file = "output/cleaned_mls_season_2026_stats.csv", row.names = FALSE)
+write.csv(league_data, file = paste0("output/", league, "/cleaned_", league, "_season_2026_stats.csv"), row.names = FALSE)
 
 #league_data
 
@@ -67,7 +74,8 @@ exclude_cols <- c(exclude_cols,
   "Non.penalty.xG",
   "Non-penalty xG against",
   "Expected.goals..xG.",
-  "xG.on.target..xGOT."
+  "xG.on.target..xGOT.",
+  "points"
 )
 
 #For each team in the league, compute correlation of points vs another metric for each game
@@ -95,7 +103,7 @@ for (team in unique(league_data$Team)) {
     }
     results_table[[team]] <- do.call(rbind, results)
     #Write individual team results as CSV
-    write.csv(results_table[[team]], file = paste0("output/club_results/", team, "_correlation_results.csv"), row.names = FALSE)
+    write.csv(results_table[[team]], file = paste0("output/", league, "/club_results/", team, "_correlation_results.csv"), row.names = FALSE)
 }
 
 results_table <- do.call(rbind, results_table)
@@ -112,12 +120,12 @@ results_table <- results_table %>%
   mutate(pearson_fdr_p_by_stat = p.adjust(pearson_p, method = "fdr")) %>%
   ungroup()
 
-#Filter for significant results (FDR adjusted p < 0.05)
+#Filter for significant results (FDR adjusted p < 0.10)
 significant_results <- results_table %>%
-  filter(pearson_fdr_p < 0.05) %>% arrange(stat, desc(pearson_r2))
+  filter(pearson_fdr_p < 0.10) %>% arrange(stat, desc(pearson_r2))
 
 #Write full data as CSV
-write.csv(results_table, file = "output/mls_correlation_results.csv", row.names = FALSE)
+write.csv(results_table, file = paste0("output/", league, "/", league, "_correlation_results.csv"), row.names = FALSE)
 results_table <- results_table %>% arrange(stat, desc(pearson_r2))
-write.csv(results_table, file = "output/mls_correlation_results_sorted_by_stat.csv", row.names = FALSE)
-write.csv(significant_results, file = "output/mls_correlation_significant_results.csv", row.names = FALSE)
+write.csv(results_table, file = paste0("output/", league, "/", league, "_correlation_results_sorted_by_stat.csv"), row.names = FALSE) # nolint
+write.csv(significant_results, file = paste0("output/", league, "/", league, "_correlation_significant_results.csv"), row.names = FALSE)
