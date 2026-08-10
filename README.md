@@ -32,4 +32,18 @@ First, why compute correlation and run hypothesis tests instead of simply analyz
 
 In either case, the same underlying metric with the same value require vastly different tactical responses. This is why we calculate correlation against npxG difference. If for some club, a metric shows a strong positive correlation against npxG difference, we can predict that both the offensive and defensive performance of the club tends to increase as the underlying metric increases. On the other hand, a lack of strong correlation may imply that increasing or decreasing that metric has little impact on a team's performance.
 
-###
+### Example 1: Analyzing Chelsea's Offensive Methods
+Chelsea especially provides a case where this sort of analysis can be valuable. Let us analyze four main methods a team can create chances: shots inside the box, shots outside the box, crossing, and set play. The following shows a table of relevant metrics and their corresponding correlation data given by our pipeline:
+| Stat | Pearson r | Pearson R² | Pearson p | Pearson FDR p | Spearman ρ | Spearman p |
+|---|---|---|---|---|---|---|
+| npxG per shot | 0.7316 | 0.5353 | 1.80e-07 | 2.53e-05 | 0.5916 | 9.16e-05 |
+| Shots inside box | 0.5178 | 0.2681 | 0.0009 | 0.0074 | 0.5267 | 0.0007 |
+| Corners | 0.2924 | 0.0855 | 0.0748 | 0.1736 | 0.3776 | 0.0194 |
+| xG set play | 0.1760 | 0.0310 | 0.2905 | 0.4405 | 0.2473 | 0.1345 |
+| Shots outside box | 0.0757 | 0.0057 | 0.6515 | 0.7762 | 0.1476 | 0.3766 |
+| Accurate crosses | 0.0619 | 0.0038 | 0.7122 | 0.8229 | 0.1667 | 0.3173 |
+| Accurate crosses % | -0.0532 | 0.0028 | 0.7511 | 0.8431 | -0.0018 | 0.9914 |
+
+First, note that npxG per shot and shots inside box are both significant metrics and boast a strong correlation against npxG difference. This tells us that Chelsea tend to rely heavily on clear chances inside the box. Furthermore, the lack of correlation and significance for corners, set play, shots outside the box, and crossing tells us that 
+
+I want to emphasize that these results do not *necessarily* mean that Chelsea tend to cross less or shoot less outside the box, but rather, an increase in this metric often does not really affect overall performance. Tactically, if playing against Chelsea, this means that it is worthwhile to defend more compactly in the box in favor of giving up more crosses and shots outside the box. Defenders should allow for wingers to cross more often and invite players to shoot from distance
