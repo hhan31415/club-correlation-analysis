@@ -46,4 +46,18 @@ Chelsea especially provides a case where this sort of analysis can be valuable. 
 
 First, note that npxG per shot and shots inside box are both significant metrics and boast a strong correlation against npxG difference. This tells us that Chelsea tend to rely heavily on clear chances inside the box. Furthermore, the lack of correlation and significance for corners, set play, shots outside the box, and crossing tells us that 
 
-I want to emphasize that these results do not *necessarily* mean that Chelsea tend to cross less or shoot less outside the box, but rather, an increase in this metric often does not really affect overall performance. Tactically, if playing against Chelsea, this means that it is worthwhile to defend more compactly in the box in favor of giving up more crosses and shots outside the box. Defenders should allow for wingers to cross more often and invite players to shoot from distance
+I want to emphasize that these results do not *necessarily* mean that Chelsea tend to cross less or shoot less outside the box, but rather, an increase in these metrics often does not really affect overall performance. Tactically, if playing against Chelsea, this means that it is worthwhile to defend more compactly in the box in favor of giving up more crosses and shots outside the box. Defenders should allow for wingers to cross more often and invite players to shoot from distance to give up less space within the box.
+
+The following shows the distribition of each metric above across all of Chelsea's matches, divided by the match result (win, draw, or loss). We can see that the correlation analysis above matches well with the actual results, with metrics like crossing and set pieces having little to no effect on the result of a match.
+![](img/chelsea_shots.png)
+![](img/chelsea_crossing.png)
+![](img/chelsea_set_pieces.png)
+
+### Example 2: Identifying Weaknesses in Crystal Palace's Defense
+We will now show an example where a combination of correlation statistics and raw data values can help us identify certain strengths and weaknesses in a club's playstyle. Let us take Crystal Palace's clearance statistics. Its correlation result tells gives us r = -0.464 with a FDR p-value of 0.0183, well within significant range. Thus we can quite confidently say that Crystal Palace has a moderate negative correlation; i.e., more clearances tend to correlate with worse npxG difference. 
+
+This does not yet mean that clearances are weak points of Crystal Palace's playstyle. Indeed, if Crystal Palace clearances per game is low, this could point to a strength - that Crystal Palace play well out of pressure without relying on clearances for defense. In fact, this is Arsenal's case to a weaker degree; their correlation for clearances is -0.324 with FDR-adjusted p-value of 0.12, while they have the 5th least clearances per game in the league. 
+
+The problem is that Crystal Palace has the *highest* clearances per game in the league at 33.66. Even if we try to account for imbalance in possession by ranking by clearances over posession or clearances over passes in own half, Crystal Palace still rank first and second respectively. This means that Crystal Palace relies on clearances more heavily than any other team in the league, and yet also statistically plays the worst when relying on clearances. 
+
+### Example 3:
