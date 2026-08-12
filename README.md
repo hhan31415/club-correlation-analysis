@@ -60,4 +60,21 @@ This does not yet mean that clearances are weak points of Crystal Palace's plays
 
 The problem is that Crystal Palace has the *highest* clearances per game in the league at 33.66. Even if we try to account for imbalance in possession by ranking by clearances over posession or clearances over passes in own half, Crystal Palace still rank first and second respectively. This means that Crystal Palace relies on clearances more heavily than any other team in the league, and yet also statistically plays the worst when relying on clearances. 
 
-### Example 3:
+### Example 3: Mid-season Pre-match Analysis - LA Galaxy vs LAFC
+Now we will take the 2026 MLS match data and simulate the kinds of pre-match analysis one might perform in preparation for a match. Since the MLS season is ongoing, the data accounts for half of a usual full season worth of data, which, while giving us much rougher results, better simulates conditions for using this analysis before actual matches. We will take clubs LA Galaxy and LAFC as the teams to do the analysis.
+
+A major difference between the club is shown in their relation to passing statistic, which we can see from the [correlation data](data/mls_season_2026_stats.csv):
+| Stat | Team | Pearson r | Pearson R^2 | Pearson p | Pearson FDR p | Spearman ρ | Spearman p |
+|---|---|---|---|---|---|---|---|
+| Accurate passes | LA Galaxy | 0.6551 | 0.4291 | 0.0080 | 0.0837 | 0.6179 | 0.0163 |
+| Accurate passes | Los Angeles FC | -0.0316 | 0.0010 | 0.9110 | 0.9657 | 0.0821 | 0.7728 |
+| Accurate passes % | LA Galaxy | 0.5873 | 0.3449 | 0.0213 | 0.1415 | 0.6194 | 0.0138 |
+| Accurate passes % | Los Angeles FC | 0.0397 | 0.0016 | 0.8882 | 0.9590 | 0.1048 | 0.7101 |
+| Passes | LA Galaxy | 0.6435 | 0.4141 | 0.0096 | 0.0920 | 0.6214 | 0.0156 |
+| Passes | Los Angeles FC | -0.0545 | 0.0030 | 0.8470 | 0.9458 | 0.0143 | 0.9642 |
+
+LA Galaxy shows a moderate correlation between the three passing metrics and npxG difference. The FDR-adjusted p-values are a bit higher than we'd like, but for mid-season analysis they're low enough to make some careful predictions. On the other hand, LAFC shows absolutely no correlation for the three metrics.
+
+Again, it's best to corroborate these with raw stats. The interesting part about both LAFC and LA Galaxy is that their accurate passes and accurate passes % are both roughly the same in the 75th percentile across the MLS. Thus, while both clubs share similar stats in passing, the correlation data tells us that this raw value means different things to each club.
+
+For LA Galaxy, 
