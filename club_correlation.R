@@ -1,11 +1,11 @@
 library(dplyr)
 
 #Modifies data to use relevant stats
-league <- "premier_league"
-#league <- "mls"
+#league <- "premier_league"
+league <- "mls"
 
-league_data <- read.csv(paste0("data/", league, "_season_2025-2026_stats.csv"))
-#league_data <- read.csv(paste0("data/", league, "_season_2026_stats.csv"))
+#league_data <- read.csv(paste0("data/", league, "_season_2025-2026_stats.csv"))
+league_data <- read.csv(paste0("data/", league, "_season_2026_stats.csv"))
 
 
 league_data <- league_data %>% filter(Status != "Upcoming") # nolint: pipe_consistency_linter.
@@ -52,7 +52,9 @@ for (i in seq_len(nrow(league_data))) {
 }
 league_data[["Non-penalty xG difference"]] <- league_data[["Non.penalty.xG"]] - league_data[["Non-penalty xG against"]] # nolint
 league_data <- league_data %>% mutate(npxG_per_shot = Non.penalty.xG / Total.shots)
-league_data <- league_data %>% select(-"Distance.covered", -"Sprinting", -"Number.of.sprints")
+
+#These metrics exist in specific leagues, but not all leagues; remove them when necessary
+#league_data <- league_data %>% select(-"Distance.covered", -"Sprinting", -"Number.of.sprints")
 
 #cleaned league data for reference
 write.csv(league_data, file = paste0("output/", league, "/cleaned_", league, "_season_2026_stats.csv"), row.names = FALSE)
@@ -124,8 +126,13 @@ results_table <- results_table %>%
 significant_results <- results_table %>%
   filter(pearson_fdr_p < 0.10) %>% arrange(stat, desc(pearson_r2))
 
+top_results <- results_table %>% 
+  group_by(stat) %>% slice_max(order_by = pearson_r2, n=3) %>% ungroup() %>%
+  arrange(stat, desc(pearson_r2))
+
 #Write full data as CSV
 write.csv(results_table, file = paste0("output/", league, "/", league, "_correlation_results.csv"), row.names = FALSE)
 results_table <- results_table %>% arrange(stat, desc(pearson_r2))
 write.csv(results_table, file = paste0("output/", league, "/", league, "_correlation_results_sorted_by_stat.csv"), row.names = FALSE) # nolint
 write.csv(significant_results, file = paste0("output/", league, "/", league, "_correlation_significant_results.csv"), row.names = FALSE)
+write.csv(top_results, file = paste0("output/", league, "/", league, "_correlation_top_results.csv"), row.names = FALSE)

@@ -1,12 +1,10 @@
-# Correlation Analysis of Various Metrics vs xG Difference for Clubs in the MLS
+# Correlation Analysis of Various Metrics vs xG Difference
 
 ## by Heechan Han
 
 ## Contents
 - [Introduction](#introduction)
-- [Computing Correlation](#computing-correlation)
-- [Comparing Leagues](#comparing-leagues)
-- [Interesting Observations](#interesting-observations)
+- [Correlation Data](#correlation data)
 - [Conclusion](#conclusion)
 
 ## Introduction
@@ -53,7 +51,7 @@ The following shows the distribition of each metric above across all of Chelsea'
 ![](img/chelsea_crossing.png)
 ![](img/chelsea_set_pieces.png)
 
-### Example 2: Identifying Weaknesses in Crystal Palace's Defense
+### Example 2: Identifying a Major Weakness in Crystal Palace's Defense
 We will now show an example where a combination of correlation statistics and raw data values can help us identify certain strengths and weaknesses in a club's playstyle. Let us take Crystal Palace's clearance statistics. Its correlation result tells gives us r = -0.464 with a FDR p-value of 0.0183, well within significant range. Thus we can quite confidently say that Crystal Palace has a moderate negative correlation; i.e., more clearances tend to correlate with worse npxG difference. 
 
 This does not yet mean that clearances are weak points of Crystal Palace's playstyle. Indeed, if Crystal Palace clearances per game is low, this could point to a strength - that Crystal Palace play well out of pressure without relying on clearances for defense. In fact, this is Arsenal's case to a weaker degree; their correlation for clearances is -0.324 with FDR-adjusted p-value of 0.12, while they have the 5th least clearances per game in the league. 
@@ -77,4 +75,38 @@ LA Galaxy shows a moderate correlation between the three passing metrics and npx
 
 Again, it's best to corroborate these with raw stats. The interesting part about both LAFC and LA Galaxy is that their accurate passes and accurate passes % are both roughly the same in the 75th percentile across the MLS. Thus, while both clubs share similar stats in passing, the correlation data tells us that this raw value means different things to each club.
 
-For LA Galaxy, 
+Starting with LA Galaxy, we can look at other metrics with high correlation: 
+| stat                             | pearson_r  | pearson_r2  | pearson_p  | spearman_rho | spearman_p  | team_name | pearson_fdr_p |
+|----------------------------------|------------|-------------|------------|--------------|-------------|-----------|---------------|
+| xG.open.play                     | 0.80578504 | 0.649289538 | 0.00028708 | 0.7          | 0.004876431 | LA Galaxy | 0.012057338   |
+| Accurate.passes                  | 0.65507604 | 0.429124617 | 0.00803399 | 0.617857143  | 0.016310268 | LA Galaxy | 0.08365977    |
+| Passes                           | 0.64352171 | 0.414120194 | 0.00964045 | 0.621428571  | 0.015571842 | LA Galaxy | 0.09202248    |
+| Blocks                           | -0.6112164 | 0.373585534 | 0.01548436 | -0.530838788 | 0.041751435 | LA Galaxy | 0.121181952   |
+| Goal.conceded                    | -0.6105296 | 0.372746427 | 0.01563287 | -0.544312816 | 0.035923368 | LA Galaxy | 0.121423367   |
+| Accurate.passes   percentage     | 0.58731861 | 0.344943148 | 0.02133104 | 0.619398571  | 0.013797575 | LA Galaxy | 0.141458459   |
+| Shots.on.target                  | 0.52403231 | 0.274609862 | 0.04494925 | 0.300205973  | 0.276970885 | LA Galaxy | 0.214530529   |
+| Accurate.long.balls   percentage | 0.51170371 | 0.26184069  | 0.05119776 | 0.542857143  | 0.039158555 | LA Galaxy | 0.232047422   |
+| Own.half                         | 0.50384665 | 0.25386145  | 0.0554992  | 0.339589054  | 0.215592311 | LA Galaxy | 0.242809021   |
+| Opposition.half                  | 0.50078191 | 0.250782522 | 0.05724666 | 0.567857143  | 0.029804473 | LA Galaxy | 0.246249753   |
+
+We must be more cautious with many of these metrics as their FDR p-value is not significant. Still, it's interesting to note that passing metrics are among the strongest correlation for LA Galaxy. A strong negative correlation for blocks implies a potential weakness against more shots. Interestingly, many attacking metrics like touches in opposition box, npxG per shot, big chances, and even goals scored present a lower correlation. Comparing this with LAFC's top 10 metrics:
+
+| stat                             | pearson_r  | pearson_r2  | pearson_p  | spearman_rho | spearman_p  | team_name      | pearson_fdr_p |
+|----------------------------------|------------|-------------|------------|--------------|-------------|----------------|---------------|
+| xG.open.play                     | 0.86134516 | 0.74191548  | 3.70E-05   | 0.788204068  | 0.000481785 | Los Angeles FC | 0.00576641    |
+| Shots.inside.box                 | 0.7074844  | 0.500534175 | 0.00317425 | 0.637423964  | 0.010583767 | Los Angeles FC | 0.045971915   |
+| Goal.scored                      | 0.66257181 | 0.439001406 | 0.00710975 | 0.523377708  | 0.045266078 | Los Angeles FC | 0.07789817    |
+| Big.chances                      | 0.65916158 | 0.434493982 | 0.00751926 | 0.530977347  | 0.041688145 | Los Angeles FC | 0.079615646   |
+| npxG_per_shot                    | 0.62799127 | 0.394373036 | 0.01218301 | 0.45         | 0.094351958 | Los Angeles FC | 0.107387741   |
+| Tackles                          | -0.5877779 | 0.345482848 | 0.0212048  | -0.61443935  | 0.014801963 | Los Angeles FC | 0.141365315   |
+| Touches.in.opposition.box        | 0.58562365 | 0.342955061 | 0.02180189 | 0.500453462  | 0.057436284 | Los Angeles FC | 0.143074934   |
+| Successful.dribbles   percentage | 0.51422957 | 0.264432048 | 0.04986849 | 0.596961811  | 0.018798205 | Los Angeles FC | 0.229322254   |
+| Shots.on.target                  | 0.44500265 | 0.198027363 | 0.09648349 | 0.349881955  | 0.201107752 | Los Angeles FC | 0.329455822   |
+| Total.shots                      | 0.42335914 | 0.179232958 | 0.11585082 | 0.402160232  | 0.137271624 | Los Angeles FC | 0.366083144   |
+
+Which consist of the more commonly expected attacking metrics like big chances and npxG per shot. We also see a much heavier emphasis on shot taking and movement towards and inside the box.
+
+Again, even if the individual metrics themselves may not be significant, these values paint us a good overall picture of the playstyle that works for each club. LA Galaxy's playstyle favors controlling the ball with passes across the field. LAFC's playstyle favors creating as many chances within the box as possible. In general, when doing this sort of analysis, it's important to note that these are not *necessarily* the playstyles that these teams generally use, but rather the playstyles that seems to have found the most success. 
+
+## Conclusion
+The above examples are only a number of a variety of interesting discoveries and techniques possible through this analysis. It is a good way of identifying threatening metrics in an opponent and one's own playstyle. It can be used to support pre-match analysis, as well as inform scouting and signing strategy by discovering player profiles that match the strengths and fill in the weaknesses of a given team. 
