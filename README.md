@@ -52,7 +52,7 @@ The following shows the distribution of each metric above across all of Chelsea'
 ![](img/chelsea_set_pieces.png)
 
 Let us look at how this analysis can help us in scouting potential players to sign. Consider the following chart:
-![](graphics/quadrant_matrix.png)
+![](graphics/quadrant_matrix.png){width = 400, height = 300}
 which shows the relationship between correlation and the underlying value. More simply, we can interpret the underlying value (compared with the rest of the league) as the ability for a club to generate a metric, and the correlation strength as the ability to effectively use a metric.
 
 For Chelsea, its npxG per shot is well above the league average, and its shots in and out of the box are both slightly above the league average. For npxG per shot and shots in the box, this means these metrics are in the top-left quadrant. For shots outside the box, the metric is in the top-right quadrant. Thus, the club should either invest in players with great long-distance ability to better convert the high number of shots outside the box, or the team should change tactically to be more wary of long shots and instead use the space from those opportunities to try and find a way into the box.
